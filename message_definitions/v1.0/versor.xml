@@ -33,7 +33,7 @@
 
   <messages>
 
-    <message id="42001" name="LOW_G_IMU">
+    <message id="42006" name="LOW_G_IMU">
       <description>
         Low ACCEL from BMI088, low GYRO from BMI088, and low TEMP from BMI088
       </description>
