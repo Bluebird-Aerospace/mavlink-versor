@@ -2,4 +2,5 @@
 <mavlink>
   <include>all.xml</include>
   <include>versor.xml</include>
+  <messages/>
 </mavlink>
