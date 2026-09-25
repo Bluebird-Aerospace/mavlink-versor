@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+  versor.xml - custom MAVLink dialect for the versor flight computer.
+
+  This dialect ADDS to common.xml, it does not replace it. Never edit
+  common.xml directly: it is upstream-owned, your edits are lost on the next
+  regeneration, and the IDs you pick there will eventually collide with
+  upstream additions.
+
+  Generate with pymavlink.tools.mavgen, passing lang=C, wire-protocol=2.0,
+  and an output directory of Core/Inc/mavlink/mavlink. (The exact flags are
+  omitted here because a double dash is not legal inside an XML comment.)
+
+  mavgen resolves the include below relative to THIS file's directory, so common.xml
+  must sit next to this file (copy or symlink it from the mavlink repo's
+  message_definitions/v1.0/).
+
+  Both ends must be regenerated together. Every message carries a CRC_EXTRA
+  byte derived from its name, field names, types and order; if the firmware
+  and the ground station disagree by so much as a renamed field, every frame
+  fails CRC and shows up as BAD_DATA - which looks identical to link
+  corruption and is a miserable thing to chase.
+
+  IDs 42001+ are well clear of the 0-12920 range this tree's common dialect
+  already allocates. Before adding another, check for collisions:
+      grep -rhoE "MAVLINK_MSG_ID_[A-Z0-9_]+ [0-9]+" Core/Inc/mavlink/mavlink/ \
+        | awk '{print $2}' | sort -n -u
+-->
+<mavlink>
+  <include>common.xml</include>
+
+  <dialect>1</dialect>
+
+  <messages>
+
+    <message id="42001" name="LOW_G_IMU">
+      <description>
+        Low ACCEL from BMI088, low GYRO from BMI088, and low TEMP from BMI088
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float[3]" name="low_accel" units="m/s/s">Acceleration, body frame XYZ</field>
+      <field type="float[3]" name="low_gyro" units="deg/s">Angular rate, body frame XYZ</field>
+      <field type="float" name="low_temp" units="degC">Temperature</field>
+    </message>
+
+    <message id="42002" name="HIGH_G_IMU">
+      <description>
+        High ACCEL from LSM6DSV320X, low ACCEL from LSM6DSV320X (which is technically ACCEL2 for differentiation with low ACCEL from BMI088), and (technically high) GYRO from LSM6DSV320X
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float[3]" name="high_accel" units="m/s/s">Acceleration, body frame XYZ</field>
+      <field type="float[3]" name="low_accel" units="m/s/s">Acceleration, body frame XYZ</field>
+      <field type="float[3]" name="gyro" units="deg/s">Angular rate, body frame XYZ</field>
+    </message>
+
+    <message id="42003" name="LOW_BARO">
+      <description>
+        Pressure and Temperature data from BMP388
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float" name="pressure" units="Pa">Pressure</field>
+      <field type="float" name="low_temp" units="degC">Temperature</field>
+    </message>
+
+    <message id="42004" name="HIGH_BARO">
+      <description>
+        Pressure and Temperature data from MS5611
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float" name="pressure" units="Pa">Pressure</field>
+      <field type="float" name="low_temp" units="degC">Temperature</field>
+    </message>
+
+    <message id="42005" name="ESKF_STATE">
+      <description>
+        ESKF nominal state :: 16 stuff - p(3) v(3) q(4) b_a(3) b_g(3)
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float[3]" name="pos" units="m">Position, NED</field>
+      <field type="float[3]" name="vel" units="m/s">Velocity, NED</field>
+      <field type="float[4]" name="q">Attitude quaternion, body-to-nav, w x y z</field>
+      <field type="float[3]" name="b_a" units="m/s/s">Accelerometer bias, body frame</field>
+      <field type="float[3]" name="b_g" units="rad/s">Gyroscope bias, body frame</field>
+    </message>
+
+    <!--
+      Adding fields later: anything appended after an <extensions/> tag is
+      optional and back-compatible with decoders built before it existed.
+      Fields BEFORE that tag get reordered by size on the wire and are part
+      of the CRC_EXTRA, so changing them breaks every existing decoder.
+      Extension fields are append-only - never insert one in the middle.
+
+      <extensions/>
+      <field type="float" name="temperature" units="degC">Die temperature.</field>
+    -->
+
+  </messages>
+</mavlink>
