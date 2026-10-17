@@ -83,6 +83,17 @@
       <field type="float[3]" name="b_g" units="rad/s">Gyroscope bias, body frame</field>
     </message>
 
+    <message id="42007" name="RIGID_BODY">
+      <description>
+        Lever-arm monitor (EulerTask): angular rate and accel at the IMU vs moved to the CG
+      </description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp since system boot</field>
+      <field type="float[3]" name="omega" units="rad/s">Angular rate, bias-corrected, body frame</field>
+      <field type="float[3]" name="accel_imu" units="m/s/s">Accel at the IMU, body frame</field>
+      <field type="float[3]" name="accel_cg" units="m/s/s">Accel moved to the CG, body frame</field>
+    </message>
+
+
     <!--
       Adding fields later: anything appended after an <extensions/> tag is
       optional and back-compatible with decoders built before it existed.
